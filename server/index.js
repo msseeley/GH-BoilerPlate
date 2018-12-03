@@ -19,3 +19,8 @@ app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(err.status || 500).send(err.message || 'Internal Server Error')
 })
+
+const port = process.env.PORT || 8000
+app.listen(port, () => {
+  console.log(`server running on port: ${port}`)
+})
