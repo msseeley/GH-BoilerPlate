@@ -13,3 +13,9 @@ app.use('/api', require('./api')) //api url prefix for routes from api folder
 app.get('*', (req, res, next) => { //send its index.html for any requests that don't match one of our API routes
   res.sendFile(path.join((__dirname, '../public')))
 })
+
+app.use((err, req, res, next) => {
+  console.error(err)
+  console.error(err.stack)
+  res.status(err.status || 500).send(err.message || 'Internal Server Error')
+})
