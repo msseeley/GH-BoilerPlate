@@ -5,6 +5,7 @@ import thunkMiddleware from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import dummyReducer from './dummyReducer'
 
+
 const reducer = combineReducers({ dummyReducer })
 
 const store = createStore(
