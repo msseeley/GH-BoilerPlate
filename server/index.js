@@ -4,7 +4,7 @@ const path = require('path') //build-it
 const volleyball = require('volleyball')
 const session = require('express-session')
 const passport = require('passport')
-const { dbStore } = require('./db')
+const { dbStore, User } = require('./db')
 
 app.use(volleyball) //logging middleware for requests and response
 app.use(express.static(path.join(__dirname, '..', 'public'))) // forward slash only works on linux and windows.
@@ -23,6 +23,21 @@ app.use(session({
 app.use(passport.initialize())
 
 app.use(passport.session())
+
+passport.serializeUser((user, done) => {
+  try {
+    done(null, user.id)
+  } catch (error) { done(error) } //in case the user does not exist, catch the error
+})
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id)
+    done(null, user)
+  } catch (error) {
+    done(error)
+  }
+})
 
 app.use('/api', require('./api')) //api url prefix for routes from api folder
 
