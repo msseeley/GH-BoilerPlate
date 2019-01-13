@@ -4,6 +4,7 @@ const path = require('path') //build-it
 const volleyball = require('volleyball')
 const session = require('express-session')
 const passport = require('passport')
+const { dbStore } = require('./db')
 
 app.use(volleyball) //logging middleware for requests and response
 app.use(express.static(path.join(__dirname, '..', 'public'))) // forward slash only works on linux and windows.
@@ -13,8 +14,10 @@ app.use(express.urlencoded({ extended: true })) //url encoding parsing
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'Unsecure secret here',
+  store: dbStore,
   resave: false,// this option says if you haven't changed anything, don't resave. Reduces session concurrency issues
   saveUninitialized: false //if new and unmodified don't save
+
 }))
 
 app.use(passport.initialize())
