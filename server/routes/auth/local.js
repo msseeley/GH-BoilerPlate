@@ -1,16 +1,49 @@
 const router = require('express').Router()
+const { User } = require("../../db")
 
-router.put('/:id', async (req, res, next) => {
+router.post('/', async (req, res, next) => {
+  try {
+    if (req.body.isAdmin === true && !req.user.isAdmin) { res.send("You don not have permissions to set Admin") }
+    else {
+      const [user] = await User.findOrCreate({
+        where: {
+          email: req.body.email,
+          password: req.body.password
+        }
+      })
+      if (user) {
+        req.login(user, error => (error ? next(error) : res.json(user)))
+      }
+      else {
+        const error = new Error("Incorrect Email or Password")
+        error.status = 401
+        throw error
+      }
+    }
+  }
+  catch (error) {
+    if (error.name === "SequelizeUniqueConstraintError") {
+      res.status(401).send('User already exists')
+    }
+    else { next(error) }
+  }
+})
+
+router.put('/', async (req, res, next) => {
   try {
     if (!req.user.isAdmin || !req.user.id !== req.params.id) {
-      res.json("You do not have permissions for your request")
+      res.send("You do not have permissions for your request")
     }
     else if (req.body.isAdmin === true && !req.user.isAdmin) {
-      res.json("You do not have permissions to set Admin")
+      res.send("You do not have permissions to set Admin")
     }
 
-    const modifiedUser = await
-
+    const user = await User.findOne({ where: { email: req.body.email } })
+    if (!user) { res.status(401).send("User not found") }
+    else if (!user.password) { res.send("Incorrect Password") }
+    else {
+      req.login(user, error => (error ? next(error) : res.json(user)))
+    }
   }
   catch (error) {
     next(error)
