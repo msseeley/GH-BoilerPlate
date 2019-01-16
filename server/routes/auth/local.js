@@ -33,9 +33,11 @@ router.put('/', async (req, res, next) => {
   try {
     if (!req.user.isAdmin || !req.user.id !== req.params.id) {
       res.send("You do not have permissions for your request")
+      return
     }
     else if (req.body.isAdmin === true && !req.user.isAdmin) {
       res.send("You do not have permissions to set Admin")
+      return
     }
 
     const user = await User.findOne({ where: { email: req.body.email } })

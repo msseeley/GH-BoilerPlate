@@ -3,6 +3,8 @@ const { User } = require('../../db')
 const passport = require('passport')
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 
+router.get('/auth/google', passport.authenticate('google', { scope: 'email' }))
+
 router.get('/callback', passport.authenticate('google', {
   successRedirect: '/home',
   falureRedirect: '/'
