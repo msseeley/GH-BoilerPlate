@@ -1,6 +1,7 @@
 const router = require('express').Router()
 
-router.get('/', (req, res, next) => {
+//fetches the logged in user
+router.get('/me', (req, res, next) => {
   res.json(req.user || {})
 })
 
