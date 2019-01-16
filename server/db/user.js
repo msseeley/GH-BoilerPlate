@@ -36,7 +36,7 @@ const User = db.defint('user', {
 
 module.exports = User
 
-User.prototype.password = function (submittedPass) {
+User.prototype.checkPassword = function (submittedPass) {
   return User.encryptPassword(submittedPass, this.salt() === this.password())
 }
 

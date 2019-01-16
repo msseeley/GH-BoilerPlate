@@ -1,10 +1,11 @@
 const router = require('express').Router()
 const { User } = require("../../db")
 
-router.post('/', async (req, res, next) => {
+router.post('/signup', async (req, res, next) => {
   try {
     if (req.body.isAdmin === true && !req.user.isAdmin) { res.send("You don not have permissions to set Admin") }
     else {
+      //ends up being signup or login bc of findOrCreate
       const [user] = await User.findOrCreate({
         where: {
           email: req.body.email,
@@ -29,20 +30,12 @@ router.post('/', async (req, res, next) => {
   }
 })
 
+//Put request /auth/local means changing current user, updating the user on the session
 router.put('/', async (req, res, next) => {
   try {
-    if (!req.user.isAdmin || !req.user.id !== req.params.id) {
-      res.send("You do not have permissions for your request")
-      return
-    }
-    else if (req.body.isAdmin === true && !req.user.isAdmin) {
-      res.send("You do not have permissions to set Admin")
-      return
-    }
-
     const user = await User.findOne({ where: { email: req.body.email } })
     if (!user) { res.status(401).send("User not found") }
-    else if (!user.password) { res.send("Incorrect Password") }
+    else if (!user.checkPassword(req.body.password)) { res.send("Incorrect Password") }
     else {
       req.login(user, error => (error ? next(error) : res.json(user)))
     }
