@@ -39,7 +39,7 @@ passport.deserializeUser(async (id, done) => {
   }
 })
 
-app.use('/api', require('./api')) //api url prefix for routes from api folder
+app.use(require('./routes'))
 
 app.get('*', (req, res, next) => { //send its index.html for any requests that don't match one of our API routes
   res.sendFile(path.join(__dirname, '..', 'public'))
