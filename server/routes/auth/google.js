@@ -7,8 +7,9 @@ router.get('/auth/google', passport.authenticate('google', { scope: 'email' }))
 
 router.get('/callback', passport.authenticate('google', {
   successRedirect: '/home',
-  falureRedirect: '/'
+  falureRedirect: '/login'
 }))
+
 
 const googleCredentials = {
   clientID: process.env.GOOGLE_CLIENT_ID || 'foo',
