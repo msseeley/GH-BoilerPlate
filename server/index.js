@@ -12,28 +12,37 @@ app.use(express.static(path.join(__dirname, '..', 'public'))) // forward slash o
 app.use(express.json()) //json parsing
 app.use(express.urlencoded({ extended: true })) //url encoding parsing
 
+
+//session initially has an id and other metadata
+//reliant on the client sending the same cookie--cookie can expire, often to do so when they quit their whole browser, this can be modified
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'Unsecure secret here',
-  store: dbStore,
+  store: dbStore, //persists to dbStore
   resave: false,// this option says if you haven't changed anything, don't resave. Reduces session concurrency issues
   saveUninitialized: false //if new and unmodified don't save
+}))//assigns req.session
 
-}))
+//Passport establishes req.user, enables express routes to use req.user object, that req.user represents the currently logged-in user.
+//How? By storing something on the session, in this case a user.id
+//Defines req.user w/its session middlware
 
 app.use(passport.initialize())
 
-app.use(passport.session())
+app.use(passport.session()) //assigns req.user for every incoming request,when someone's logged in, it is a user instance, if not it's null.
 
-passport.serializeUser((user, done) => {
+//assumes that validation has already been done  via req.login in the route, which is then directed to our password validation methods vvv
+
+passport.serializeUser((user, done) => { //serialize put something on the session ONLY when they log (in this case the user.id)
   try {
-    done(null, user.id)
+    done(null, user.id) //tells passport to put the user id on the session
   } catch (error) { done(error) } //in case the user does not exist, catch the error
 })
 
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id)
-    done(null, user)
+    done(null, user) //what req.user gets assigned @ every request,
   } catch (error) {
     done(error)
   }
